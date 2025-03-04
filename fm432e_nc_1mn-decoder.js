@@ -87,7 +87,7 @@ function decode_T1(payload, recvTime){
     if(recvTime != null){
       var d = new Date(recvTime)
       d.setSeconds(d.getSeconds() - ((20-i)*time_step*60)-(10*60));//10 min shift for 1 min sensors
-      data.power_list.push([d,(payload[5+2*i] & 0xFF) << 8 | (payload[6+2*i] & 0xFF)])
+      data.power_list.push([d.getTime(),(payload[5+2*i] & 0xFF) << 8 | (payload[6+2*i] & 0xFF)])
     }else data.power_list.push((payload[5+2*i] & 0xFF) << 8 | (payload[6+2*i] & 0xFF))
   }
   return data
