@@ -157,8 +157,8 @@ function decode_T1_MME(payload,type,recvTime){
         if(recvTime != null){
           var d = new Date(recvTime)
           d.setSeconds(d.getSeconds() - ((15-i)*data.time_step*60));
-          data.powers.push([d,null])
-          data.increments.push([d,null])
+          data.powers.push([d.getTime(),null])
+          data.increments.push([d.getTime(),null])
         }else{
           data.powers.push(null);
           data.increments.push(null);
@@ -170,8 +170,8 @@ function decode_T1_MME(payload,type,recvTime){
       if(recvTime != null){
         var d = new Date(recvTime)
         d.setSeconds(d.getSeconds() - ((15-i)*data.time_step*60));
-        data.increments.push([d,value])
-        data.powers.push([d,value*60/data.time_step])
+        data.increments.push([d.getTime(),value])
+        data.powers.push([d.getTime(),value*60/data.time_step])
       }else {
         data.increments.push(value)
         data.powers.push(value*60/data.time_step)
@@ -183,8 +183,8 @@ function decode_T1_MME(payload,type,recvTime){
     if(recvTime != null){
       var d = new Date(recvTime)
       d.setSeconds(d.getSeconds() - ((15-i)*data.time_step*60));
-      if((i!=15 && data.increments[i][1] == null) || data.index == null) data.indexes.unshift([d,null])
-      else data.indexes.unshift([d,idx])
+      if((i!=15 && data.increments[i][1] == null) || data.index == null) data.indexes.unshift([d.getTime(),null])
+      else data.indexes.unshift([d.getTime(),idx])
       if(i!=0 && data.increments[i-1][1] != null) idx -= data.increments[i-1][1]
     }else{
       if((i!=15 && data.increments[i] == null) || data.index == null) data.indexes.unshift(null)
@@ -203,7 +203,7 @@ function decode_T1_MECA(payload,recvTime){
     if(recvTime != null){
       var d = new Date(recvTime)
       d.setSeconds(d.getSeconds() - ((20-i)*1*60)-(10*60));//10 min shift
-      data.powers.push([d,(payload[5+2*i] & 0xFF) << 8 | (payload[6+2*i] & 0xFF)])
+      data.powers.push([d.getTime(),(payload[5+2*i] & 0xFF) << 8 | (payload[6+2*i] & 0xFF)])
     }else{
       data.powers.push((payload[5+2*i] & 0xFF) << 8 | (payload[6+2*i] & 0xFF))
     }
