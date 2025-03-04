@@ -100,7 +100,7 @@ function decode_T1(payload, recvTime){
     if(recvTime != null){
       var d = new Date(recvTime)
       d.setSeconds(d.getSeconds() - ((nb_values_in_payload-i)*data.time_step*60));
-      data.increments.push([d,(payload[6+2*i] & 0xFF) << 8 | (payload[7+2*i] & 0xFF)])
+      data.increments.push([d.getTime(),(payload[6+2*i] & 0xFF) << 8 | (payload[7+2*i] & 0xFF)])
       data.powers.push([data.increments[i][0],data.increments[i][1] * 60 / data.time_step])
     }else{
        data.increments.push((payload[6+2*i] & 0xFF) << 8 | (payload[7+2*i] & 0xFF))
