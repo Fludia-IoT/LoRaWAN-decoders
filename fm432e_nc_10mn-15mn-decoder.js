@@ -103,8 +103,8 @@ function decode_T1(payload,time_step,recvTime){
     if(recvTime != null){
       var d = new Date(recvTime)
       d.setSeconds(d.getSeconds() - ((8-i)*time_step*60));
-      data.increments.push([d,(payload[4+2*i] & 0xFF) << 8 | (payload[5+2*i] & 0xFF)])
-      data.powers.push([d,data.increments[i][1] * 60 / time_step])
+      data.increments.push([d.getTime(),(payload[4+2*i] & 0xFF) << 8 | (payload[5+2*i] & 0xFF)])
+      data.powers.push([d.getTime(),data.increments[i][1] * 60 / time_step])
     }else{
       data.increments.push((payload[4+2*i] & 0xFF) << 8 | (payload[5+2*i] & 0xFF))
       data.powers.push(data.increments[i] * 60 / time_step)
@@ -115,7 +115,7 @@ function decode_T1(payload,time_step,recvTime){
     if(recvTime != null){
       var d = new Date(recvTime)
       d.setSeconds(d.getSeconds() - ((8-i)*time_step*60));
-      data.indexes.unshift([d,idx])
+      data.indexes.unshift([d.getTime(),idx])
       if(i!=0) idx -= data.increments[i-1][1]
     }else{
       data.indexes.unshift(idx)
