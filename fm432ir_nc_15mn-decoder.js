@@ -189,8 +189,8 @@ function decode_T1_MME(payload, type, recvTime){
         if(recvTime != null){
           var d = new Date(recvTime)
           d.setSeconds(d.getSeconds() - ((8-i)*data.time_step*60));
-          data.powers.push([d,null])
-          data.increments.push([d,null])
+          data.powers.push([d.getTime(),null])
+          data.increments.push([d.getTime(),null])
         }else{
           data.powers.push(null);
           data.increments.push(null);
@@ -202,8 +202,8 @@ function decode_T1_MME(payload, type, recvTime){
       if(recvTime != null){
         var d = new Date(recvTime)
         d.setSeconds(d.getSeconds() - ((8-i)*data.time_step*60));
-        data.increments.push([d,value])
-        data.powers.push([d,value*60/data.time_step])
+        data.increments.push([d.getTime(),value])
+        data.powers.push([d.getTime(),value*60/data.time_step])
       }else {
         data.increments.push(value)
         data.powers.push(value*60/data.time_step)
@@ -215,8 +215,8 @@ function decode_T1_MME(payload, type, recvTime){
     if(recvTime != null){
       var d = new Date(recvTime)
       d.setSeconds(d.getSeconds() - ((8-i)*data.time_step*60));
-      if((i!=8 && data.increments[i][1] == null) || data.index == null) data.indexes.unshift([d,null])
-      else data.indexes.unshift([d,idx])
+      if((i!=8 && data.increments[i][1] == null) || data.index == null) data.indexes.unshift([d.getTime(),null])
+      else data.indexes.unshift([d.getTime(),idx])
       if(i!=0 && data.increments[i-1][1] != null) idx -= data.increments[i-1][1]
     }else{
       if((i!=8 && data.increments[i] == null) || data.index == null) data.indexes.unshift(null)
@@ -288,8 +288,8 @@ function decode_T1_MME_E_POS_AND_E_NEG(payload, type, recvTime){
         if(recvTime != null){
           var d = new Date(recvTime)
           d.setSeconds(d.getSeconds() - ((nb_values_in_payload-i)*data.time_step*60));
-          data.powers[0].push([d,null])
-          data.increments[0].push([d,null])
+          data.powers[0].push([d.getTime(),null])
+          data.increments[0].push([d.getTime(),null])
         }else{
           data.powers[0].push(null);
           data.increments[0].push(null);
@@ -301,8 +301,8 @@ function decode_T1_MME_E_POS_AND_E_NEG(payload, type, recvTime){
       if(recvTime != null){
         var d = new Date(recvTime)
         d.setSeconds(d.getSeconds() - ((nb_values_in_payload-i)*data.time_step*60));
-        data.increments[0].push([d,value])
-        data.powers[0].push([d,value*60/data.time_step])
+        data.increments[0].push([d.getTime(),value])
+        data.powers[0].push([d.getTime(),value*60/data.time_step])
       }else {
         data.powers[0].push(value*60/data.time_step)
         data.increments[0].push(value)
@@ -318,8 +318,8 @@ function decode_T1_MME_E_POS_AND_E_NEG(payload, type, recvTime){
         if(recvTime != null){
           var d = new Date(recvTime)
           d.setSeconds(d.getSeconds() - ((nb_values_in_payload-i)*data.time_step*60));
-          data.powers[1].push([d,null])
-          data.increments[1].push([d,null])
+          data.powers[1].push([d.getTime(),null])
+          data.increments[1].push([d.getTime(),null])
         }else{
           data.powers[1].push(null);
           data.increments[1].push(null);
@@ -334,8 +334,8 @@ function decode_T1_MME_E_POS_AND_E_NEG(payload, type, recvTime){
       if(recvTime != null){
         var d = new Date(recvTime)
         d.setSeconds(d.getSeconds() - ((nb_values_in_payload-i)*data.time_step*60));
-        data.increments[1].push([d,value])
-        data.powers[1].push([d,value*60/data.time_step])
+        data.increments[1].push([d.getTime(),value])
+        data.powers[1].push([d.getTime(),value*60/data.time_step])
       }else {
         data.powers[1].push(value*60/data.time_step)
         data.increments[1].push(value)
@@ -348,11 +348,11 @@ function decode_T1_MME_E_POS_AND_E_NEG(payload, type, recvTime){
     if(recvTime != null){
       var d = new Date(recvTime)
       d.setSeconds(d.getSeconds() - ((nb_values_in_payload-i)*data.time_step*60));
-      if((i!=nb_values_in_payload && data.increments[0][i][1] == null) || data.index.e_pos == null) data.indexes[0].unshift([d,null])
-      else data.indexes[0].unshift([d,idx_epos])
+      if((i!=nb_values_in_payload && data.increments[0][i][1] == null) || data.index.e_pos == null) data.indexes[0].unshift([d.getTime(),null])
+      else data.indexes[0].unshift([d.getTime(),idx_epos])
       if(i!=0 && data.increments[0][i-1][1] != null) idx_epos -= data.increments[0][i-1][1]
-      if((i!=nb_values_in_payload && data.increments[1][i][1] == null) || data.index.e_neg == null) data.indexes[1].unshift([d,null])
-      else data.indexes[1].unshift([d,idx_eneg])
+      if((i!=nb_values_in_payload && data.increments[1][i][1] == null) || data.index.e_neg == null) data.indexes[1].unshift([d.getTime(),null])
+      else data.indexes[1].unshift([d.getTime(),idx_eneg])
       if(i!=0 && data.increments[1][i-1][1] != null) idx_eneg -= data.increments[1][i-1][1]
     }else{
       if((i!=nb_values_in_payload && data.increments[0][i] == null) || data.index.e_pos == null) data.indexes[0].unshift(null)
@@ -376,7 +376,7 @@ function decode_T1_MECA(payload, time_step, recvTime){
     if(recvTime != null){
       var d = new Date(recvTime)
       d.setSeconds(d.getSeconds() - ((8-i)*time_step*60));
-      data.increments.push([d,(payload[5+2*i] & 0xFF) << 8 | (payload[6+2*i] & 0xFF)])
+      data.increments.push([d.getTime(),(payload[5+2*i] & 0xFF) << 8 | (payload[6+2*i] & 0xFF)])
       data.powers.push([data.increments[i][0],data.increments[i][1] * 60 / time_step])
     }else{
       data.increments.push((payload[5+2*i] & 0xFF) << 8 | (payload[6+2*i] & 0xFF))
@@ -388,7 +388,7 @@ function decode_T1_MECA(payload, time_step, recvTime){
     if(recvTime != null){
       var d = new Date(recvTime)
       d.setSeconds(d.getSeconds() - ((8-i)*time_step*60));
-      data.indexes.unshift([d,idx])
+      data.indexes.unshift([d.getTime(),idx])
       if(i!=0) idx -= data.increments[i-1][1]
     }else{
       data.indexes.unshift(idx)
