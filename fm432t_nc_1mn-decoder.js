@@ -73,7 +73,7 @@ function decode_T1(payload, recvTime){
     if(recvTime != null){
       var d = new Date(recvTime)
       d.setSeconds(d.getSeconds() - ((20-i)*data.time_step*60));
-      data.temperatures.push([d.getTime(),toSignedInt16(payload[2+2*i], payload[3+2*i])/100])
+      data.temperatures.push([d.toISOString(),toSignedInt16(payload[2+2*i], payload[3+2*i])/100])
     }else data.temperatures.push(toSignedInt16(payload[2+2*i], payload[3+2*i])/100)
   }
   return data

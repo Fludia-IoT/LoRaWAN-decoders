@@ -71,7 +71,7 @@ function decode_T1_AP(payload, recvTime){
     if(recvTime != null){
       var d = new Date(recvTime)
       d.setSeconds(d.getSeconds() - ((nb_values_in_payload-i)*data.time_step*60));
-      data.increments.push([d.getTime(),(payload[6+2*i] & 0xFF) << 8 | (payload[7+2*i] & 0xFF)])
+      data.increments.push([d.toISOString(),(payload[6+2*i] & 0xFF) << 8 | (payload[7+2*i] & 0xFF)])
     }else data.increments.push((payload[6+2*i] & 0xFF) << 8 | (payload[7+2*i] & 0xFF))
   }
   var idx = data.index
@@ -79,7 +79,7 @@ function decode_T1_AP(payload, recvTime){
     if(recvTime != null){
       var d = new Date(recvTime)
       d.setSeconds(d.getSeconds() - ((nb_values_in_payload-i)*data.time_step*60));
-      data.indexes.unshift([d.getTime(),idx])
+      data.indexes.unshift([d.toISOString(),idx])
       if(i!=0) idx -= data.increments[i-1][1]
     }else{
       data.indexes.unshift(idx)
