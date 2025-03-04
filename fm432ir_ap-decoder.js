@@ -353,10 +353,10 @@ function decode_T1_MME_E_POS_AND_E_NEG(payload, type, recvTime){
       var d = new Date(recvTime)
       d.setSeconds(d.getSeconds() - ((nb_values_in_payload-i)*data.time_step*60));
       if((i!=nb_values_in_payload && data.increments[0][i][1] == null) || data.index.e_pos == null) data.indexes[0].unshift([d.getTime(),null])
-      else data.indexes[0].unshift([d,idx_epos])
+      else data.indexes[0].unshift([d.getTime(),idx_epos])
       if(i!=0 && data.increments[0][i-1][1] != null) idx_epos -= data.increments[0][i-1][1]
       if((i!=nb_values_in_payload && data.increments[1][i][1] == null) || data.index.e_neg == null) data.indexes[1].unshift([d.getTime(),null])
-      else data.indexes[1].unshift([d,idx_eneg])
+      else data.indexes[1].unshift([d.getTime(),idx_eneg])
       if(i!=0 && data.increments[1][i-1][1] != null) idx_eneg -= data.increments[1][i-1][1]
     }else{
       if((i!=nb_values_in_payload && data.increments[0][i] == null) || data.index.e_pos == null) data.indexes[0].unshift(null)
