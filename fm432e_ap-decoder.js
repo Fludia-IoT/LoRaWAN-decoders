@@ -112,7 +112,7 @@ function decode_T1(payload, recvTime){
     if(recvTime != null){
       var d = new Date(recvTime)
       d.setSeconds(d.getSeconds() - ((nb_values_in_payload-i)*data.time_step*60));
-      data.indexes.unshift([d,idx])
+      data.indexes.unshift([d.getTime(),idx])
       if(i!=0) idx -= data.increments[i-1][1]
     }else{
       data.indexes.unshift(idx)
