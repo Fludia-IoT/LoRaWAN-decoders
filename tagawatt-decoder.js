@@ -69,14 +69,14 @@ function decode_T1(payload, recvTime){
         data.tags.push({
           id_tag: id_tag,
           id_tag_str: ('00000000'+id_tag.toString(16)).substr(-8),
-          power_index: val,
+          cumulative_energy: val,
           date : d.toISOString()
         });
       }else{
         data.tags.push({
           id_tag: id_tag,
           id_tag_str: ('00000000'+id_tag.toString(16)).substr(-8),
-          current_index: val,
+          cumulative_current: val,
           date: d.toISOString()
         });
       }
@@ -85,13 +85,13 @@ function decode_T1(payload, recvTime){
         data.tags.push({
           id_tag: id_tag,
           id_tag_str: ('00000000'+id_tag.toString(16)).substr(-8),
-          power_index: val
+          cumulative_energy: val
         });
       }else{
         data.tags.push({
           id_tag: id_tag,
           id_tag_str: ('00000000'+id_tag.toString(16)).substr(-8),
-          current_index: val
+          cumulative_current: val
         });
       }
      }
