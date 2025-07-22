@@ -64,7 +64,7 @@ function decode_T1(payload, recvTime){
     }
     if(recvTime != null){
       var d = new Date(recvTime)
-      d.setSeconds(d.getSeconds() - ((nb_values_in_payload-i)*data.time_step*60));
+      d.setSeconds(d.getSeconds() - (data.time_shifting*60));
       if(isPower){
         data.tags.push({
           id_tag: id_tag,
