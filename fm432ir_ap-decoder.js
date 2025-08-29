@@ -3,8 +3,13 @@ const PAYLOAD_TYPE = {
   T1_MME_E_POS           :  {header: 0x72, size_min: 13/*in bytes*/, size_max: 51/*in bytes*/, name: "T1_MME_E_POS"},
   T1_MME_E_NEG           :  {header: 0x73, size_min: 13/*in bytes*/, size_max: 51/*in bytes*/, name: "T1_MME_E_NEG"},
   T1_MME_E_POS_AND_E_NEG :  {header: 0x74, size_min: 23/*in bytes*/, size_max: 51/*in bytes*/, name: "T1_MME_E_POS_AND_E_NEG"},
+  T1_MME_E_SUM_WH        :  {header: 0x75, size_min: 13/*in bytes*/, size_max: 51/*in bytes*/, name: "T1_MME_E_SUM_WH"},
+  T1_MME_E_POS_WH        :  {header: 0x76, size_min: 13/*in bytes*/, size_max: 51/*in bytes*/, name: "T1_MME_E_POS_WH"},
+  T1_MME_E_NEG_WH        :  {header: 0x77, size_min: 13/*in bytes*/, size_max: 51/*in bytes*/, name: "T1_MME_E_NEG_WH"},
+  T1_MME_E_POS_AND_E_NEG_WH :  {header: 0x78, size_min: 23/*in bytes*/, size_max: 51/*in bytes*/, name: "T1_MME_E_POS_AND_E_NEG_WH"},
   T1_MECA            :  {header: 0x6F, size_min: 8/*in bytes*/, size_max: 46/*in bytes*/, name: "T1_MECA"},
   T2_MME             :  {header: 0x3a, size: 21/*in bytes*/, name: "T2_MME"},
+  T2_MME_WH          :  {header: 0x3b, size: 21/*in bytes*/, name: "T2_MME_WH"},
   T2_MECA            :  {header: 0x70, size: 16/*in bytes*/, name: "T2_MECA"},
   TT1_MECA           :  {header: 0x12, size: 37/*in bytes*/, name: "TT1_MECA"},
   TT2_MECA           :  {header: 0x13, size: 30/*in bytes*/, name: "TT2_MECA"},
@@ -42,15 +47,25 @@ function decodeUplink(input){
     decoded.errors.push("Invalid payload")
     return decoded
   }
-  if(decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_POS.name) decoded.data.obis = "E-POS values (OBIS code 1.8.0)";
-  if(decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_SUM.name) decoded.data.obis = "E-SUM values (OBIS code 16.8.0)";
-  if(decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_NEG.name) decoded.data.obis = "E-NEG values (OBIS code 2.8.0)";
-  if(decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_POS_AND_E_NEG.name) decoded.data.obis = "E-POS values (OBIS code 1.8.0) and E-NEG values (OBIS code 2.8.0)";
+  if(decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_POS.name
+    || decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_POS_WH.name) decoded.data.obis = "E-POS values (OBIS code 1.8.0)";
+  if(decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_SUM.name
+    || decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_SUM_WH.name) decoded.data.obis = "E-SUM values (OBIS code 16.8.0)";
+  if(decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_NEG.name
+    || decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_NEG_WH.name) decoded.data.obis = "E-NEG values (OBIS code 2.8.0)";
+  if(decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_POS_AND_E_NEG.name
+    || decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_POS_AND_E_NEG_WH.name) decoded.data.obis = "E-POS values (OBIS code 1.8.0) and E-NEG values (OBIS code 2.8.0)";
   //Decode message
   if(decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_SUM.name
     || decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_POS.name
-    || decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_NEG.name){
-    var data = decode_T1_MME(input.bytes,decoded.data.message_type, input.recvTime);
+    || decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_NEG.name
+    || decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_SUM_WH.name
+    || decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_POS_WH.name
+    || decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_NEG_WH.name){
+    var isWh = (decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_SUM_WH.name
+      || decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_POS_WH.name
+      || decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_NEG_WH.name) ? true : false;
+    var data = decode_T1_MME(input.bytes,decoded.data.message_type, input.recvTime, isWh);
     for(var i = 0;i<data.warnings.length;i++){
       decoded.warnings.push(data.warnings[i]);
     }
@@ -60,8 +75,9 @@ function decodeUplink(input){
     decoded.data.increments = data.increments;
     decoded.data.indexes = data.indexes;
     decoded.data.time_step = data.time_step;
-  }else if(decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_POS_AND_E_NEG.name){
-    var data = decode_T1_MME_E_POS_AND_E_NEG(input.bytes,decoded.data.message_type, input.recvTime);
+  }else if(decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_POS_AND_E_NEG.name || decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_POS_AND_E_NEG_WH.name){
+    var isWh = (decoded.data.message_type == PAYLOAD_TYPE.T1_MME_E_POS_AND_E_NEG_WH.name) ? true : false;
+    var data = decode_T1_MME_E_POS_AND_E_NEG(input.bytes,decoded.data.message_type, input.recvTime, isWh);
     for(var i = 0;i<data.warnings.length;i++){
       decoded.warnings.push(data.warnings[i]);
     }
@@ -71,8 +87,9 @@ function decodeUplink(input){
     decoded.data.increments = data.increments;
     decoded.data.indexes = data.indexes;
     decoded.data.time_step = data.time_step;
-  } else if(decoded.data.message_type == PAYLOAD_TYPE.T2_MME.name){
-    var data = decode_T2_MME(input.bytes);
+  } else if(decoded.data.message_type == PAYLOAD_TYPE.T2_MME.name || decoded.data.message_type == PAYLOAD_TYPE.T2_MME_WH.name){
+    var isWh = (decoded.data.message_type == PAYLOAD_TYPE.T2_MME_WH.name) ? true : false;
+    var data = decode_T2_MME(input.bytes, isWh);
     for(var i = 0;i<data.warnings.length;i++){
       decoded.warnings.push(data.warnings[i]);
     }
@@ -120,6 +137,9 @@ function find_message_type(payload){
       case PAYLOAD_TYPE.T2_MME.header:
         if(payload.length == PAYLOAD_TYPE.T2_MME.size) return PAYLOAD_TYPE.T2_MME.name
         break;
+      case PAYLOAD_TYPE.T2_MME_WH.header:
+        if(payload.length == PAYLOAD_TYPE.T2_MME_WH.size) return PAYLOAD_TYPE.T2_MME_WH.name
+        break;
     }
   }else{
     switch(payload[0]){
@@ -138,6 +158,22 @@ function find_message_type(payload){
       case PAYLOAD_TYPE.T1_MME_E_POS_AND_E_NEG.header:
         if(payload.length >= PAYLOAD_TYPE.T1_MME_E_POS_AND_E_NEG.size_min && payload.length <= PAYLOAD_TYPE.T1_MME_E_POS_AND_E_NEG.size_max)
           return PAYLOAD_TYPE.T1_MME_E_POS_AND_E_NEG.name
+        break;
+      case PAYLOAD_TYPE.T1_MME_E_SUM_WH.header:
+        if(payload.length >= PAYLOAD_TYPE.T1_MME_E_SUM_WH.size_min && payload.length <= PAYLOAD_TYPE.T1_MME_E_SUM_WH.size_max)
+          return PAYLOAD_TYPE.T1_MME_E_SUM_WH.name
+        break;
+      case PAYLOAD_TYPE.T1_MME_E_POS_WH.header:
+        if(payload.length >= PAYLOAD_TYPE.T1_MME_E_POS_WH.size_min && payload.length <= PAYLOAD_TYPE.T1_MME_E_POS_WH.size_max)
+          return PAYLOAD_TYPE.T1_MME_E_POS_WH.name
+        break;
+      case PAYLOAD_TYPE.T1_MME_E_NEG_WH.header:
+        if(payload.length >= PAYLOAD_TYPE.T1_MME_E_NEG_WH.size_min && payload.length <= PAYLOAD_TYPE.T1_MME_E_NEG_WH.size_max)
+          return PAYLOAD_TYPE.T1_MME_E_NEG_WH.name
+        break;
+      case PAYLOAD_TYPE.T1_MME_E_POS_AND_E_NEG_WH.header:
+        if(payload.length >= PAYLOAD_TYPE.T1_MME_E_POS_AND_E_NEG_WH.size_min && payload.length <= PAYLOAD_TYPE.T1_MME_E_POS_AND_E_NEG_WH.size_max)
+          return PAYLOAD_TYPE.T1_MME_E_POS_AND_E_NEG_WH.name
         break;
       case PAYLOAD_TYPE.T1_MECA.header:
         if(payload.length >= PAYLOAD_TYPE.T1_MECA.size_min && payload.length <= PAYLOAD_TYPE.T1_MECA.size_max) return PAYLOAD_TYPE.T1_MECA.name
@@ -159,7 +195,7 @@ function find_message_type(payload){
   return null
 }
 
-function decode_T1_MME(payload, type, recvTime){
+function decode_T1_MME(payload, type, recvTime, isWh){
   var data = {};
   data.time_step = payload[1];
   data.powers = [];
@@ -172,14 +208,17 @@ function decode_T1_MME(payload, type, recvTime){
         data.index = null;
   }else{
     if(!signed){
-      data.index = parseInt(toHexString(payload).substring(6, 22),16)/10
+      if(isWh) data.index = parseInt(toHexString(payload).substring(6, 22),16)
+      else data.index = parseInt(toHexString(payload).substring(6, 22),16)/10
     }else{
       if(payload[3] & 0x80){
         var bytes = [];
         for(var i = 0;i<8;i++) bytes.push(payload[i+3])
-        data.index = toSignedInt64(bytes)/10
+        if(isWh) data.index = toSignedInt64(bytes)
+        else data.index = toSignedInt64(bytes)/10
       }else{//Positive no issue
-          data.index = parseInt(toHexString(payload).substring(6, 22),16)/10
+          if(isWh) data.index = parseInt(toHexString(payload).substring(6, 22),16)
+          else data.index = parseInt(toHexString(payload).substring(6, 22),16)/10
       }
     }
   }
@@ -198,8 +237,13 @@ function decode_T1_MME(payload, type, recvTime){
         }
     }else{
       var value = 0;
-      if(!signed) value = toUnsignedInt16(payload[11+i*2],payload[12+i*2])/10;
-      else value = toSignedInt16(payload[11+i*2],payload[12+i*2])/10;
+      if(!signed){
+        if(isWh) value = toUnsignedInt16(payload[11+i*2],payload[12+i*2]);
+        else value = toUnsignedInt16(payload[11+i*2],payload[12+i*2])/10;
+      } else{
+        if(isWh) value = toSignedInt16(payload[11+i*2],payload[12+i*2]);
+        else value = toSignedInt16(payload[11+i*2],payload[12+i*2])/10;
+      }
       /*if(type == PAYLOAD_TYPE.T1_MME_E_NEG.name && value > 0){
         value = -value;
       }*/
@@ -232,7 +276,7 @@ function decode_T1_MME(payload, type, recvTime){
   return data
 }
 
-function decode_T1_MME_E_POS_AND_E_NEG(payload, type, recvTime){
+function decode_T1_MME_E_POS_AND_E_NEG(payload, type, recvTime, isWh){
   var data = {};
   data.time_step = payload[1];
   data.powers = [[],[]];
@@ -257,15 +301,18 @@ function decode_T1_MME_E_POS_AND_E_NEG(payload, type, recvTime){
         data.index.e_pos = null;
   }else{
     if(!signedPos){
-      data.index.e_pos = parseInt(toHexString(payload).substring(6, 22),16)/10
+      if(isWh) data.index.e_pos = parseInt(toHexString(payload).substring(6, 22),16)
+      else data.index.e_pos = parseInt(toHexString(payload).substring(6, 22),16)/10
     }else{
       if(payload[3] & 0x80){
         //We have a negative number
         var bytes = [];
         for(var i = 0;i<8;i++) bytes.push(payload[i+3])
-        data.index.e_pos = toSignedInt64(bytes)/10
+        if(isWh) data.index.e_pos = toSignedInt64(bytes)
+        else data.index.e_pos = toSignedInt64(bytes)/10
       }else{//Positive no issue
-          data.index.e_pos = parseInt(toHexString(payload).substring(6, 22),16)/10
+          if(isWh) data.index.e_pos = parseInt(toHexString(payload).substring(6, 22),16)
+          else data.index.e_pos = parseInt(toHexString(payload).substring(6, 22),16)/10
       }
     }
   }
@@ -274,16 +321,19 @@ function decode_T1_MME_E_POS_AND_E_NEG(payload, type, recvTime){
         data.index.e_neg = null;
   }else{
     if(!signedNeg){
-      data.index.e_neg = parseInt(toHexString(payload).substring(22+(4*nb_values_in_payload), 22+(4*nb_values_in_payload)+16),16)/10
+      if(isWh) data.index.e_neg = parseInt(toHexString(payload).substring(22+(4*nb_values_in_payload), 22+(4*nb_values_in_payload)+16),16)
+      else data.index.e_neg = parseInt(toHexString(payload).substring(22+(4*nb_values_in_payload), 22+(4*nb_values_in_payload)+16),16)/10
       //data.index.e_neg = - data.index.e_neg
     }else{
       if(payload[3+8+2*nb_values_in_payload] & 0x80){
         //We have a negative number
         var bytes = [];
         for(var i = 0;i<8;i++) bytes.push(payload[i+(11+2*nb_values_in_payload)])
-        data.index.e_neg = toSignedInt64(bytes)/10
+        if(isWh) data.index.e_neg = toSignedInt64(bytes)
+        else data.index.e_neg = toSignedInt64(bytes)/10
       }else{//Positive no issue
-          data.index.e_neg = parseInt(toHexString(payload).substring(22+(4*nb_values_in_payload), 22+(4*nb_values_in_payload)+16),16)/10
+          if(isWh) data.index.e_neg = parseInt(toHexString(payload).substring(22+(4*nb_values_in_payload), 22+(4*nb_values_in_payload)+16),16)
+          else data.index.e_neg = parseInt(toHexString(payload).substring(22+(4*nb_values_in_payload), 22+(4*nb_values_in_payload)+16),16)/10
       }
     }
   }
@@ -301,8 +351,13 @@ function decode_T1_MME_E_POS_AND_E_NEG(payload, type, recvTime){
         }
     }else{
       var value = 0;
-      if(!signedPos) value = toUnsignedInt16(payload[11+i*2],payload[12+i*2])/10;
-      else value = toSignedInt16(payload[11+i*2],payload[12+i*2])/10;
+      if(!signedPos){
+        if(isWh) value = toUnsignedInt16(payload[11+i*2],payload[12+i*2]);
+        else value = toUnsignedInt16(payload[11+i*2],payload[12+i*2])/10;
+      } else {
+        if(isWh) value = toSignedInt16(payload[11+i*2],payload[12+i*2]);
+        else value = toSignedInt16(payload[11+i*2],payload[12+i*2])/10;
+      }
       if(recvTime != null){
         var d = new Date(recvTime)
         d.setSeconds(d.getSeconds() - ((nb_values_in_payload-i)*data.time_step*60));
@@ -332,9 +387,13 @@ function decode_T1_MME_E_POS_AND_E_NEG(payload, type, recvTime){
     }else{
       var value = 0;
       if(!signedNeg){
-        value = toUnsignedInt16(payload[19+nb_values_in_payload*2+i*2],payload[20+nb_values_in_payload*2+i*2])/10;
+        if(isWh) value = toUnsignedInt16(payload[19+nb_values_in_payload*2+i*2],payload[20+nb_values_in_payload*2+i*2]);
+        else value = toUnsignedInt16(payload[19+nb_values_in_payload*2+i*2],payload[20+nb_values_in_payload*2+i*2])/10;
       }
-      else value = toSignedInt16(payload[19+nb_values_in_payload*2+i*2],payload[20+nb_values_in_payload*2+i*2])/10;
+      else{
+        if(isWh) value = toSignedInt16(payload[19+nb_values_in_payload*2+i*2],payload[20+nb_values_in_payload*2+i*2]);
+        else value = toSignedInt16(payload[19+nb_values_in_payload*2+i*2],payload[20+nb_values_in_payload*2+i*2])/10;
+      }
       if(recvTime != null){
         var d = new Date(recvTime)
         d.setSeconds(d.getSeconds() - ((nb_values_in_payload-i)*data.time_step*60));
@@ -421,7 +480,7 @@ function decode_T2_MECA(payload){
   return data;
 }
 
-function decode_T2_MME(payload){
+function decode_T2_MME(payload, isWh){
   var data = {};
   data.time_step = payload[2];
   data.number_of_values = payload[3];
@@ -450,9 +509,11 @@ function decode_T2_MME(payload){
       //We have a negative number
       var bytes = [];
       for(var i = 0;i<8;i++) bytes.push(payload[i+13])
-      data.index = toSignedInt64(bytes)/10
+      if (isWh) data.index = toSignedInt64(bytes)
+      else data.index = toSignedInt64(bytes)/10
     }else{//Positive no issue
-        data.index = parseInt(toHexString(payload).substring(26, 42),16)/10
+        if (isWh) data.index = parseInt(toHexString(payload).substring(26, 42),16)
+        else data.index = parseInt(toHexString(payload).substring(26, 42),16)/10
     }
   }
   return data;

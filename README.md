@@ -9,7 +9,7 @@ These decoders are following the [LoRa Alliance Payload Codec API Specification 
 - **fm432e_nc_10mn-15mn-decoder.js** for FM432e v57
 - **fm432g_ap-decoder.js** for FM432g v33
 - **fm432g_nc_10mn-15mn-decoder.js** for FM432g v32
-- **fm432ir_ap-decoder.js** for FM432ir v21
+- **fm432ir_ap-decoder.js** for FM432ir v21 & v22
 - **fm432ir_nc_1mn-decoder.js** for FM432ir v18
 - **fm432ir_nc_15mn-decoder.js** for FM432ir v20
 - **fm432p_ap-decoder.js** for FM432p v3.3.6
