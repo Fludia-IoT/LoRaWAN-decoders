@@ -503,7 +503,10 @@ function decode_T2_MME(payload, isWh){
   data.scaler_e_neg = toSignedInt8(payload[12]);
   if(payload[12] == 0x7F) data.scaler_e_neg = null;
   else data.scaler_e_neg = Math.pow(10, data.scaler_e_neg)
-  if(data.measure == 0 || data.measure == 2 || data.measure == 3) data.index = parseInt(toHexString(payload).substring(26, 42),16)/10;
+  if(data.measure == 0 || data.measure == 2 || data.measure == 3){
+    if (isWh) data.index = parseInt(toHexString(payload).substring(26, 42),16);
+    else data.index = parseInt(toHexString(payload).substring(26, 42),16)/10;
+  }
   if(data.measure == 1){
     if(payload[13] & 0x80){
       //We have a negative number
