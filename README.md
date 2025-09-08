@@ -17,6 +17,7 @@ These decoders are following the [LoRa Alliance Payload Codec API Specification 
 - **fm432t_nc_1mn-decoder.js** for FM432t v5.0.2 with 1 minute configuration
 - **fm432t_nc_10mn-15mn-decoder.js** for FM432t v5.0.2
 - **tagawatt-decoder.js** for TAGAWATT
+- **fm432e-i_ap-decoder.js** for FM432e-i v1
 
 ## How to use the decoders  
 
@@ -36,6 +37,50 @@ Expected `input` object format:
 
 <details open>
 <summary><strong>FM432e</strong></summary>
+<br>  
+
+Example of `output` JSON Object:
+
+```javascript
+    data: {
+      index : 1256,
+      message_type : "T1",
+      increments : [1,2,3,4],
+      powers: [1,2,3,4],
+      indexes: [1,2,3,4],         
+      meter_type : "Electromechanical (Position A)",
+      low_battery : 0,
+      firmware_version: 54,
+      number_of_starts : 1,
+      time_step : 1,
+      param_id: 0,
+      redundancy: 0,
+      number_of_values: 4,
+      sensitivity: 0
+    },
+    warnings: [],
+    errors: []
+  }
+```
+
+  * `index` index starting at 0 when the device starts  
+  * `message_type` type of message  
+  * `increments` array containing the index increments. If `recvTime` is provided, it will be a 2-dimensional array containing JavaScript Date objects ```[[2024-08-02T19:30:00.000Z, 1],...]```. No increments available for 1min products  
+  * `powers` array containing the load curve values in W. If `recvTime` is provided, it will be a 2-dimensional array containing JavaScript Date objects ```[[2024-08-02T19:30:00.000Z, 1],...]```   
+  * `indexes` array containing the indexes. If `recvTime` is provided, it will be a 2-dimensional array containing JavaScript Date objects ```[[2024-08-02T19:30:00.000Z, 1],...]```. No indexes available for 1min products  
+  * `meter_type` "Electromechanical (Position A)" or "Electronic (Position B)"  
+  * `low_battery` 1 means the battery is low / 0 otherwise  
+  * `firmware_version` firmware version as an integer  
+  * `number_of_starts` number of starts of this sensor  
+  * `time_step` number of minutes for each measurement  
+  * `param_id` NA   
+  * `redundancy` when activated, previous increments are repeated (only available in _ap products)  
+  * `number_of_values` number of measurement values in each T1 uplink (only available in _ap products)  
+  * `sensitivity` 0 = highest sensitivity / 3 = lowest sensitivity (only available in _ap products)  
+</details>
+
+<details>
+<summary><strong>FM432e-i</strong></summary>
 <br>  
 
 Example of `output` JSON Object:
