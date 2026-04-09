@@ -130,6 +130,7 @@ function decode_T2(payload){
   data.meter_type = payload[6];
   if(data.meter_type == 0) data.meter_type = "Electromechanical (Position A)"
   if(data.meter_type == 1) data.meter_type = "Electronic (Position B)"
+  if(data.meter_type == 2) data.meter_type = "Electromechanical (Red)"
   data.low_battery = payload[7];
   data.index = (payload[8] & 0xFF) << 24 | (payload[9] & 0xFF) << 16 | (payload[10] & 0xFF) << 8 | (payload[11] & 0xFF);
   data.time_step = payload[12];
